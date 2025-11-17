@@ -1,7 +1,11 @@
 # import a class Flask
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, flash, redirect 
+from forms import RegistrationForm, LoginForm 
+
 # create an instance 
 app = Flask(__name__)
+
+app.config['SECRET_KEY'] = 'c765149c9618cedc66ff06f71b2fc50f' # protect our sever from attack 
 
 posts = [
     {
@@ -32,6 +36,26 @@ def home():
 @app.route("/about")
 def about(): 
     return render_template("about.html", title='About')
+
+@app.route("/register", methods=['GET','POST'])
+def register():
+    form = RegistrationForm() 
+    if form.validate_on_submit():
+        flash(f'Account created for {form.username.data}!', 'success')
+        return redirect(url_for('home'))  
+    # url_for(xxx) xxx is the func name, not the route name; return the url of corresponding route
+    return render_template("register.html", title='Register', form=form)
+
+@app.route("/login", methods=['Get', 'POST'])
+def login():
+    form = LoginForm() 
+    if form.validate_on_submit():
+        if form.email.data == 'admin@blog.com' and form.password.data == 'password':
+            flash('You have been logged in!', 'success')
+            return redirect(url_for('home')) 
+        else:
+            flash('Login unsuccessful. Please check username and password', 'danger')
+    return render_template("login.html", title='Login', form=form)
 
 if __name__ == "__main__":
     app.run(debug=True)
