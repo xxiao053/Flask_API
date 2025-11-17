@@ -1,41 +1,6 @@
-# import a class Flask
-from flask import Flask, render_template, url_for, flash, redirect 
-from forms import RegistrationForm, LoginForm
-# from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import create_engine, text 
-
-# create an instance 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'c765149c9618cedc66ff06f71b2fc50f' # protect our sever from attack 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blogsite.db'  # SQLlite, or PostgreSQL, or...
-# db = SQLAlchemy(app)  # OMR, map table to python class 
-engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'], future=True)  # Core
-
-def create_table():
-    sql_user = """
-    CREATE TABLE IF NOT EXISTS user(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE NOT NULL,
-        email TEXT UNIQUE NOT NULL,
-        image_file TEXT NOT NULL DEFAULT 'default.jpg',
-        password TEXT NOT NULL
-    );
-    """
-    sql_post = """
-    CREATE TABLE IF NOT EXISTS post(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        date_posted DATETIME NOT NULL,
-        content TEXT NOT NULL,
-        user_id INTEGER NOT NULL,
-        FOREIGN KEY(user_id) REFERENCES user(id)
-    );
-    """
-    with engine.begin() as conn:
-        conn.execute(text(sql_user))
-        conn.execute(text(sql_post))
-
-create_table() 
+from flask import render_template, url_for, flash, redirect 
+from flaskblog import app 
+from flaskblog.forms import RegistrationForm, LoginForm
 
 posts = [
     {
@@ -86,6 +51,3 @@ def login():
         else:
             flash('Login unsuccessful. Please check username and password', 'danger')
     return render_template("login.html", title='Login', form=form)
-
-if __name__ == "__main__":
-    app.run(debug=True)
