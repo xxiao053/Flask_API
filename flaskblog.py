@@ -1,5 +1,5 @@
 # import a class Flask
-from flask import Flask
+from flask import Flask, render_template
 # create an instance 
 app = Flask(__name__)
 
@@ -10,7 +10,7 @@ app = Flask(__name__)
 @app.route("/")
 @app.route("/home")
 def home(): 
-    return "<h1>Home Page<h1>"
+    return render_template("home.html")  # all html files must be stored under the "templates" folder
 
 @app.route("/about")
 def about(): 
