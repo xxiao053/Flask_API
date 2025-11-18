@@ -13,4 +13,4 @@ bcrypt = Bcrypt(app)  # for password authentication
 # login_manager = LoginManager(app)
 
 from flaskblog import routes
-from flaskblog.services import task_service
+from flaskblog.services import task_service, payment_service
