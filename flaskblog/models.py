@@ -21,3 +21,12 @@ sql_insert_user = """
     INSERT INTO user (username, email, password)
     VALUES (:username, :email, :password)
 """
+sql_task = """
+    CREATE TABLE IF NOT EXISTS task(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        description TEXT,
+        completed INTEGER DEFAULT 0
+    );
+"""
+
