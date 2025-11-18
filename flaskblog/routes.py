@@ -27,6 +27,7 @@ posts = [
 
 # route are what we type into our browser to go to different pages
 # decoraters are just a way to add additional functionality to existing functions 
+# We use the route() decorator to tell Flask what URL should trigger our function.
 # "/" is the root page or home page essentially. But we can also create a "home" page as well
 # These two pages are using the same contents  
 @app.route("/")
