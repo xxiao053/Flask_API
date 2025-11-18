@@ -66,34 +66,35 @@ def create_task():
 def update_task(task_id):
     data = request.get_json(silent=True) or {}
 
-    # Allow partial update
-    fields = {}
-    if "title" in data:
-        fields["title"] = data["title"]
-    if "description" in data:
-        fields["description"] = data["description"]
-    if "completed" in data:
-        # convert to 0/1 for SQLite
-        fields["completed"] = 1 if data["completed"] else 0
-
-    if not fields:
+    if data is None:
         return jsonify({"error": "No fields to update"}), 400
     
     with engine.begin() as conn:
         # check exists 
-        exists = conn.execute(text("SELECT 1 FROM task WHERE id = :id"), {"id": task_id}).first()
+        exists = conn.execute(text("SELECT title, description, completed FROM task WHERE id = :id"), {"id": task_id}).first()
         if exists is None: 
             abort(404)
 
-        set_clauses = ", ".join([f"{k} = {fields[k]}" for k in fields.keys()])
+        # Allow partial update, otherwise use original values
+        current = exists._mapping
+        new_title = data.get("title", current["title"])
+        new_description = data.get("description", current["description"])
+        if "completed" in data: 
+            # convert to 0/1 for SQLite
+            new_completed = 1 if data["completed"] else 0
+        else:
+            new_completed = current["completed"]
 
         conn.execute(
             text(f"""
                 UPDATE task
-                SET {set_clauses}
+                SET title = :title, description = :description, completed = :completed
                 WHERE id = :id
             """),
-            {"id": task_id}
+            {"id": task_id,
+             "title": new_title,
+             "description": new_description,
+             "completed": new_completed}
             )
         
         result = conn.execute(
