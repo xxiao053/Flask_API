@@ -17,3 +17,7 @@ sql_post = """
         FOREIGN KEY(user_id) REFERENCES user(id)
     );
     """
+sql_insert_user = """
+    INSERT INTO user (username, email, password)
+    VALUES (:username, :email, :password)
+"""

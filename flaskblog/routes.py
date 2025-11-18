@@ -1,6 +1,8 @@
 from flask import render_template, url_for, flash, redirect 
-from flaskblog import app 
+from flaskblog import app, engine, bcrypt
 from flaskblog.forms import RegistrationForm, LoginForm
+from sqlalchemy import text
+from flaskblog.models import sql_insert_user
 
 posts = [
     {
@@ -36,8 +38,11 @@ def about():
 def register():
     form = RegistrationForm() 
     if form.validate_on_submit():
-        flash(f'Account created for {form.username.data}!', 'success')
-        return redirect(url_for('home'))  
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        with engine.begin() as conn: 
+            conn.execute(text(sql_insert_user), {"username":form.username.data, "email":form.email.data, "password":hashed_password})
+        flash(f'Your account has been created! You are now able to log in.', 'success')
+        return redirect(url_for('login'))  
     # url_for(xxx) xxx is the func name, not the route name; return the url of corresponding route
     return render_template("register.html", title='Register', form=form)
 
