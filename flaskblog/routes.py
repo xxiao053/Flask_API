@@ -3,6 +3,8 @@ from flaskblog import app, engine, bcrypt
 from flaskblog.forms import RegistrationForm, LoginForm
 from sqlalchemy import text
 from flaskblog.models import sql_insert_user
+from flaskblog.models import User, Post
+from flask_login import login_user, current_user
 
 posts = [
     {
@@ -38,23 +40,30 @@ def about():
 
 @app.route("/register", methods=['GET','POST'])
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
     form = RegistrationForm() 
     if form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')  
+        # hash user's pwd and only store hashed pwd; with .decode() we get hashed string instead byte version
         with engine.begin() as conn: 
             conn.execute(text(sql_insert_user), {"username":form.username.data, "email":form.email.data, "password":hashed_password})
         flash(f'Your account has been created! You are now able to log in.', 'success')
         return redirect(url_for('login'))  
-    # url_for(xxx) xxx is the func name, not the route name; return the url of corresponding route
+    # url_for(xxx ) xxx is the func name, not the route name; return the url of corresponding route
     return render_template("register.html", title='Register', form=form)
 
 @app.route("/login", methods=['Get', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        # when user login successfully, remove login and register, logout appears 
+        return redirect(url_for('home'))
     form = LoginForm() 
     if form.validate_on_submit():
-        if form.email.data == 'admin@blog.com' and form.password.data == 'password':
-            flash('You have been logged in!', 'success')
-            return redirect(url_for('home')) 
+        user = User.query.filter_by(email=form.email.data).first()  # check if user enter an email exists in db
+        if user and bcrypt.check_password_hash(user.password, form.password.data):  # if user enter pwd is valid based on hashed pwd in db
+            login_user(user, remember=form.remember.data)
+            return redirect(url_for('home'))
         else:
-            flash('Login unsuccessful. Please check username and password', 'danger')
+            flash('Login unsuccessful. Please check email and password', 'danger')
     return render_template("login.html", title='Login', form=form)
