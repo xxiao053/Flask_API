@@ -81,6 +81,7 @@ def account():
     if form.validate_on_submit():
         current_user.username = form.username.data 
         current_user.email = form.email.data 
+        db.session.commit()  # without this, no change save in db 
         flash('your account has been updated!', 'success')
         return redirect(url_for('account'))
     elif request.method == 'GET':
