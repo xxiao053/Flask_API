@@ -4,7 +4,7 @@ from flaskblog.forms import RegistrationForm, LoginForm
 from sqlalchemy import text
 from flaskblog.models import sql_insert_user
 from flaskblog.models import User, Post
-from flask_login import login_user, current_user
+from flask_login import login_user, current_user, logout_user
 
 posts = [
     {
@@ -67,3 +67,8 @@ def login():
         else:
             flash('Login unsuccessful. Please check email and password', 'danger')
     return render_template("login.html", title='Login', form=form)
+
+@app.route("/logout")
+def logout():
+    logout_user()
+    return redirect(url_for('home'))
