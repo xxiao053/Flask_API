@@ -9,7 +9,7 @@ app = Flask(__name__)  # instantiate
 app.config['SECRET_KEY'] = 'c765149c9618cedc66ff06f71b2fc50f' # protect our sever from attack 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # absolute path of this file's folder
 DB_PATH = os.path.join(BASE_DIR, "blogsite.db")
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_PATH}'  
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_PATH}'  # set abs path for db, so core and orm can better share
 engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'], future=True)  # Core
 db = SQLAlchemy(app)  # ORM(object-relational mapping)
 bcrypt = Bcrypt(app)  # for password authentication (hash real password)
