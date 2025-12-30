@@ -1,10 +1,10 @@
-from flask import render_template, url_for, flash, redirect 
+from flask import render_template, url_for, flash, redirect, request
 from flaskblog import app, engine, bcrypt
 from flaskblog.forms import RegistrationForm, LoginForm
 from sqlalchemy import text
 from flaskblog.models import sql_insert_user
 from flaskblog.models import User, Post
-from flask_login import login_user, current_user, logout_user
+from flask_login import login_user, current_user, logout_user, login_required
 
 posts = [
     {
@@ -63,7 +63,8 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()  # check if user enter an email exists in db
         if user and bcrypt.check_password_hash(user.password, form.password.data):  # if user enter pwd is valid based on hashed pwd in db
             login_user(user, remember=form.remember.data)
-            return redirect(url_for('home'))
+            next_page = request.args.get('next')  # actually redirect user to the page user visited (before being directed to login page)
+            return redirect(next_page) if next_page else redirect(url_for('home'))
         else:
             flash('Login unsuccessful. Please check email and password', 'danger')
     return render_template("login.html", title='Login', form=form)
@@ -74,5 +75,6 @@ def logout():
     return redirect(url_for('home'))
 
 @app.route("/account")
+@login_required  # you have to login to access this page
 def account():
     return render_template("account.html", title='Account')

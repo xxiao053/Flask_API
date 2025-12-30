@@ -14,6 +14,8 @@ engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'], future=True)  # Co
 db = SQLAlchemy(app)  # ORM(object-relational mapping)
 bcrypt = Bcrypt(app)  # for password authentication (hash real password)
 login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+login_manager.login_message_category = 'info'
 
 from flaskblog import routes  # when everytime I run this app, I need to register these routes, which means those decorators@ codes should be executed, so import script here
 from flaskblog.services import task_service, payment_service
