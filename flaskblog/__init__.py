@@ -17,5 +17,5 @@ login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 login_manager.login_message_category = 'info'
 
-from flaskblog import routes  # when everytime I run this app, I need to register these routes, which means those decorators@ codes should be executed, so import script here
+from flaskblog import routes  # when everytime I run this app, I need to register these routes, which means those decorators@ codes should be executed, so import script here; reason put import after above initiation is to avoid circular import 
 from flaskblog.services import task_service, payment_service
