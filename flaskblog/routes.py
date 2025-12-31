@@ -9,27 +9,6 @@ from flaskblog.models import sql_insert_user
 from flaskblog.models import User, Post
 from flask_login import login_user, current_user, logout_user, login_required
 
-posts = [
-    {
-        'author': 'Xiao Xiao',
-        'title': 'First Blog Post',
-        'content': 'This is the first post content',
-        'date_posted': 'Sep 20, 2025'
-    },
-    {
-        'author': 'Sean James',
-        'title': 'What Makes You a Better Developer',
-        'content': 'When people first learn programming, they often focus on writing scripts, solving LeetCode problems, or building simple web pages. APIs feel like something “big companies” use. But the truth is: learning how to build even a basic API instantly levels up how you think about software.',
-        'date_posted': 'Oct 21, 2025'
-    },
-    {
-        'author': 'Martine Harden',
-        'title': "It's the foundation of almost every modern system",
-        'content': 'Payments, messaging apps, social networks, e-commerce—everything runs on APIs.\n\nEven inside Meta, Google, or PayPal, teams talk to each other through internal APIs every day.\nOnce you understand APIs, you understand how large systems communicate.',
-        'date_posted': 'Nov 29, 2025'
-    },
-]
-
 @app.route("/")
 @app.route("/home")
 def home(): 
@@ -124,5 +103,7 @@ def new_post():
         return redirect(url_for('home'))
     return render_template('create_post.html', title='New Post', form=form)
 
-
-
+@app.route("/post/<int:post_id>", methods=['GET', 'POST'])  # include variable in the route, where id essentially is part of the route
+def post(post_id):
+    post = Post.query.get_or_404(post_id)  # give me the post with this id, if doesn't exist then return 404
+    return render_template('post.html', title=post.title, post=post)
