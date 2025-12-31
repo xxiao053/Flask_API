@@ -12,7 +12,8 @@ from flask_login import login_user, current_user, logout_user, login_required
 @app.route("/")
 @app.route("/home")
 def home(): 
-    posts = Post.query.all()
+    page = request.args.get('page', 1, type=int)  # set page #
+    posts = Post.query.paginate(page= page, per_page=2)  # pagination 
     return render_template("home.html", posts=posts)  
 # all html files must be stored under the "templates" folder, and it render html files
 # pass variable into html  
@@ -107,7 +108,6 @@ def new_post():
 @app.route("/post/<int:post_id>")  # include variable in the route, where id essentially is part of the route
 def post(post_id):
     post = Post.query.get_or_404(post_id)  # give me the post with this id, if doesn't exist then return 404
-    print(post.author)
     return render_template('post.html', title=post.title, post=post)
 
 @app.route("/post/<int:post_id>/update",  methods=['GET', 'POST'])
