@@ -33,6 +33,7 @@ posts = [
 @app.route("/")
 @app.route("/home")
 def home(): 
+    posts = Post.query.all()
     return render_template("home.html", posts=posts)  
 # all html files must be stored under the "templates" folder, and it render html files
 # pass variable into html  
@@ -116,6 +117,9 @@ def account():
 def new_post():
     form = PostForm()
     if form.validate_on_submit():
+        post = Post(title=form.title.data, content=form.content.data, author=current_user)
+        db.session.add(post)  # add record to db (=insert into)
+        db.session.commit()  # save change
         flash('Your post has been created!', 'success')
         return redirect(url_for('home'))
     return render_template('create_post.html', title='New Post', form=form)
